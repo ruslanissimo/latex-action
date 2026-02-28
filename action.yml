@@ -59,6 +59,12 @@ runs:
       id: compile
       shell: bash
       run: |
+        echo "Building local Docker image..."
+        # If your Dockerfile is in the action's repository, use ${{ github.action_path }}
+        # (If it's located directly in the paper's repository, replace ${{ github.action_path }} with . )
+        docker build -t local-latex-compiler ${{ github.action_path }}
+        
+        echo "Running compilation in the local container..."
         docker run --rm \
           --workdir="${GITHUB_WORKSPACE}" \
           -v "${GITHUB_ENV}:${GITHUB_ENV}" \
@@ -67,7 +73,7 @@ runs:
           -e CI \
           -e GITHUB_ENV \
           -e GITHUB_OUTPUT \
-          danysk/compile-latex-action:2.2.7 \
+          local-latex-compiler \
           "${{ inputs.command }}" \
           "${{ inputs.verbose }}" \
           "${{ inputs.success }}"
