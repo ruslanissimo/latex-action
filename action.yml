@@ -8,6 +8,18 @@ inputs:
     description: 'Whether the results should be deployed on GitHub. Defaults to true.'
     required: false
     default: true
+  command:
+    description: 'The compilation command to use.'
+    required: false
+    default: 'latexmk -pdf -interaction=nonstopmode'
+  verbose:
+    description: 'Whether to print out the compiler logs.'
+    required: false
+    default: 'false'
+  success:
+    description: 'Name of the variable to output successful compilations.'
+    required: false
+    default: 'LATEX_SUCCESSES'
 
 runs:
   using: "composite"
