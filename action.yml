@@ -86,12 +86,20 @@ runs:
               || $GITHUB_REF == 'refs/heads/default'
               || $GITHUB_REF == "refs/tags"*
           ]]; then
-            TAG=$(git describe --tags --exact-match HEAD)
+            # Use 'latest'
+            TAG=$(git describe --tags --exact-match HEAD 2>/dev/null || echo "latest")
             echo "Preparing release $TAG"
-            git tag --delete "$TAG"
+            
+            # Remove old teg localy
+            git tag --delete "$TAG" 2>/dev/null || true
             git tag "$TAG"
-            git push --tags && echo "Tag $TAG successfully pushed" || true
-            gh release create --notes-from-tag "$TAG" || true
+            
+            # Push the tag
+            git push origin "$TAG" --force && echo "Tag $TAG successfully pushed" || true
+            
+            # Update release
+            gh release create "$TAG" --title "Release $TAG" --notes "Automated PDF build" || echo "Release already exists"
+            
             while IFS= read -r file; do
               pdf="${file%.*}.pdf"
               echo "Delivering file $pdf"
@@ -101,3 +109,4 @@ runs:
             echo "Not running deployment from unknown source: $GITHUB_REF"
           fi
         fi
+    
